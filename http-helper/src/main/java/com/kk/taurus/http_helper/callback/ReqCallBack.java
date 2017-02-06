@@ -9,11 +9,6 @@ import java.lang.reflect.Type;
 
 public abstract class ReqCallBack<T> implements HttpCallBack {
 
-    @Override
-    public void onFailure(Exception e) {
-
-    }
-
     public abstract void onResponseBean(T result);
 
     public Type getType() {

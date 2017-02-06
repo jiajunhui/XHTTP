@@ -21,9 +21,9 @@ public class MainActivity extends AppCompatActivity {
         xRequest.setUrl("http://v.juhe.cn/weixin/query");
         xRequest.addParams("pno",1);
         xRequest.addParams("ps",20);
-        xRequest.addParams("key","xxx");
+        xRequest.addParams("key","211fa04958b2cc67461c9afc01965db5");
 
-        XHTTP.newGet(xRequest, new BeanCallBack<WxArticleRsp>() {
+        XHTTP.newPost(xRequest, new BeanCallBack<WxArticleRsp>() {
             @Override
             public void onResponseBean(WxArticleRsp result) {
                 Toast.makeText(MainActivity.this, "response", Toast.LENGTH_SHORT).show();
@@ -31,8 +31,8 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(Response response) {
-                super.onError(response);
+            public void onError(int errorType,Response response) {
+                super.onError(errorType,response);
                 Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
             }
 

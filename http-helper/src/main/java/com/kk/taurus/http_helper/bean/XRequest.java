@@ -4,8 +4,6 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-import okhttp3.RequestBody;
-
 /**
  * Created by Taurus on 2017/2/4.
  */
@@ -15,7 +13,6 @@ public class XRequest implements Serializable {
     private String url;
     private Map<String,Object> mHeaders = new HashMap<>();
     private Map<String,Object> mParams = new HashMap<>();
-    private RequestBody requestBody;
 
     public XRequest addHeader(String key, Object value){
         mHeaders.put(key, value);
@@ -43,11 +40,4 @@ public class XRequest implements Serializable {
         this.url = url;
     }
 
-    public RequestBody getRequestBody() {
-        return requestBody;
-    }
-
-    public void setRequestBody(RequestBody requestBody) {
-        this.requestBody = requestBody;
-    }
 }

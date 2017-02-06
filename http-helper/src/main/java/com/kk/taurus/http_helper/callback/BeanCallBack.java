@@ -11,12 +11,22 @@ import okhttp3.Response;
 public abstract class BeanCallBack<T extends BaseResponse> extends ReqCallBack<T> {
 
     @Override
+    public void onStart() {
+
+    }
+
+    @Override
     public void onSuccess(Response response) {
 
     }
 
     @Override
-    public void onError(Response response) {
+    public void onError(int errorType, Response response) {
+
+    }
+
+    @Override
+    public void onFailure(Exception e) {
 
     }
 
