@@ -14,7 +14,8 @@ public interface OnDownloadListener {
     int ERROR_TYPE_NETWORK = 1;
 
     void onStart();
-    void onProgress(float speed, long curr, long total);
+    void onProgress(long curr, long total);
+    void onSpeed(float speed);
     void onFinish(File file);
     void onError(int errorType, Response response);
     void onFailure(Exception e);

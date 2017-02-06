@@ -18,21 +18,30 @@ import okhttp3.Response;
 
 public class DownloadManager {
 
+    private static DownloadThread downloadThread;
 
-    public static Call download(String url,String desPath, OnDownloadListener onDownloadListener){
+    public static void stopDownload(){
+        if(downloadThread!=null){
+            downloadThread.quit();
+        }
+    }
+
+
+    public static Call download(String url,String desDir, String fileName, OnDownloadListener onDownloadListener){
         DownloadRequest downloadRequest = new DownloadRequest();
         downloadRequest.setUrl(url);
-        downloadRequest.setDesPath(desPath);
+        downloadRequest.setDesDir(desDir);
+        downloadRequest.setRename(fileName);
         return download(downloadRequest,onDownloadListener);
     }
 
     public static Call download(final DownloadRequest downloadRequest, final OnDownloadListener onDownloadListener){
 
-        //builder.addHeader("Range", "bytes=" + mVideoDownloadInfo.getDownSize() + '-' + mVideoDownloadInfo.getFileSize());
-
-        File file = new File(downloadRequest.getDesPath());
-        if(file.exists()){
-            //采用同路径下的配置文件方式记录下载信息
+        //采用同路径下的配置文件方式记录下载信息
+        ConfigManager.DownloadConfig downloadConfig = ConfigManager.loadConfig(downloadRequest);
+        if(downloadConfig!=null){
+            downloadRequest.setDownloadConfig(downloadConfig);
+            downloadRequest.addHeader("Range","bytes=" + downloadConfig.getCurrSize() + "-" + downloadConfig.getTotalSize());
         }
 
         final Call call = XHTTP.buildCall(downloadRequest);
@@ -45,24 +54,38 @@ public class DownloadManager {
             return call;
         }
 
-        ThreadManager.getLongPool().execute(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Response response = call.execute();
-                    if(response.isRedirect() && downloadRequest.getRedirectCount()<DownloadRequest.MAX_REDIRECT_NUM){
-                        onRedirect(response, downloadRequest, onDownloadListener);
-                        call.cancel();
-                    }else if(response.isSuccessful()){
-                        onInputStream(response,downloadRequest,onDownloadListener);
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+        ThreadManager.getLongPool().execute(downloadThread = new DownloadThread(call,downloadRequest,onDownloadListener));
+
+//        ThreadManager.getLongPool().execute(new Runnable() {
+//            @Override
+//            public void run() {
+//                try {
+//                    onStart(onDownloadListener);
+//                    Response response = call.execute();
+//                    if(response.isRedirect() && downloadRequest.getRedirectCount()<DownloadRequest.MAX_REDIRECT_NUM){
+//                        onRedirect(response, downloadRequest, onDownloadListener);
+//                        call.cancel();
+//                    }else if(response.isSuccessful()){
+//                        onInputStream(response,downloadRequest,onDownloadListener);
+//                    }
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
         return call;
+    }
+
+    private static void onStart(final OnDownloadListener onDownloadListener) {
+        if(onDownloadListener!=null){
+            XHTTP.handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onDownloadListener.onStart();
+                }
+            });
+        }
     }
 
     private static void onInputStream(Response response, DownloadRequest downloadRequest, OnDownloadListener onDownloadListener) {
@@ -71,27 +94,82 @@ public class DownloadManager {
         int len;
         FileOutputStream fos = null;
         try{
-            File file = new File(downloadRequest.getDesPath());
+            File file = new File(downloadRequest.getDesDir(),downloadRequest.getRename());
             is = response.body().byteStream();
             long length = response.body().contentLength();
-            fos = new FileOutputStream(file,false);
-            while ((len = is.read(buf)) != -1){
-                fos.write(buf, 0, len);
-                fos.flush();
+            long _totalSize = length;
+            ConfigManager.DownloadConfig downloadConfig = downloadRequest.getDownloadConfig();
+            if(downloadConfig!=null && downloadConfig.getTotalSize()>=length){
+                _totalSize = downloadConfig.getTotalSize();
             }
+            fos = new FileOutputStream(file,false);
+            long _currSize = file.length();
+            long currMs = System.currentTimeMillis();
+            long nowMs = 0;
+            long sum = 0;
+            while ((len = is.read(buf)) != -1){
+                sum += len;
+                nowMs = System.currentTimeMillis();
+                if(nowMs - currMs >= 1000){
+                    /** 更新下载速度*/
+                    onSpeed(sum,nowMs - currMs,onDownloadListener);
+                    currMs = System.currentTimeMillis();
+                    sum = 0;
+                }
+                fos.write(buf, 0, len);
+                _currSize += len;
+                /** 更新下载进度*/
+                onProgressChange(_currSize, _totalSize,onDownloadListener);
+            }
+            fos.flush();
+            /** 下载完成*/
+            onFinish(file,onDownloadListener);
         }catch (Exception e){
             e.printStackTrace();
-            onfailure(e,onDownloadListener);
+            onFailure(e,onDownloadListener);
         }finally{
             try{
-                if (is != null) is.close();
+                if (is != null)
+                    is.close();
+                if (fos != null)
+                    fos.close();
             } catch (IOException e){
+                e.printStackTrace();
             }
-            try{
-                if (fos != null) fos.close();
-            } catch (IOException e){
-            }
+        }
+    }
 
+    private static void onSpeed(long sum, long dMs, final OnDownloadListener onDownloadListener) {
+        if(onDownloadListener!=null){
+            final float speed = (float) (((sum/1024)*1.0)/(dMs*1.0/1000));
+            XHTTP.handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onDownloadListener.onSpeed(speed);
+                }
+            });
+        }
+    }
+
+    private static void onFinish(final File file, final OnDownloadListener onDownloadListener) {
+        if(onDownloadListener!=null){
+            XHTTP.handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onDownloadListener.onFinish(file);
+                }
+            });
+        }
+    }
+
+    private static void onProgressChange(final long currSize, final long totalSize, final OnDownloadListener onDownloadListener) {
+        if(onDownloadListener!=null){
+            XHTTP.handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onDownloadListener.onProgress(currSize,totalSize);
+                }
+            });
         }
     }
 
@@ -104,7 +182,7 @@ public class DownloadManager {
         download(downloadRequest,onDownloadListener);
     }
 
-    private static void onfailure(final Exception e, final OnDownloadListener onDownloadListener){
+    private static void onFailure(final Exception e, final OnDownloadListener onDownloadListener){
         if(onDownloadListener!=null){
             XHTTP.handler.post(new Runnable() {
                 @Override

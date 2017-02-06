@@ -18,8 +18,8 @@ import java.util.Map;
 public class ConfigManager {
 
     public static DownloadConfig loadConfig(DownloadRequest downloadRequest){
-        File file = new File(downloadRequest.getDesPath());
-        File config = new File(getFileDir(downloadRequest.getDesPath()), GeneratorMD5.md5(downloadRequest.getUrl()));
+        File file = new File(downloadRequest.getDesDir(),downloadRequest.getRename());
+        File config = new File(downloadRequest.getDesDir(), md5FileName(downloadRequest.getUrl()));
         if(config.exists() && file.exists()){
             Map<String, String> configMap = readConfig(config);
             if(configMap!=null && configMap.size()>0){
@@ -67,8 +67,9 @@ public class ConfigManager {
             for(String key : result.keySet()){
                 sb.append(key).append(":").append(result.get(key)).append("\n");
             }
-            File config = new File(getFileDir(downloadRequest.getDesPath()), GeneratorMD5.md5(downloadRequest.getUrl()));
-            writeToFile(config.getAbsolutePath(),sb.toString(),false);
+            File configFile = new File(downloadRequest.getDesDir(), md5FileName(downloadRequest.getUrl()));
+            String info = sb.toString();
+            writeToFile(configFile.getAbsolutePath(),info,false);
         }
     }
 
@@ -85,16 +86,6 @@ public class ConfigManager {
         result.put(DownloadConfig.KEY_UPDATE_TIME,String.valueOf(System.currentTimeMillis()));
         result.put(DownloadConfig.KEY_TOTAL_SIZE,String.valueOf(downloadConfig.getTotalSize()));
         return result;
-    }
-
-    public static String getFileDir(String desPath){
-        if(TextUtils.isEmpty(desPath))
-            return null;
-        int index = desPath.lastIndexOf("/");
-        if(index!=-1){
-            return desPath.substring(0,index);
-        }
-        return null;
     }
 
     private static void writeToFile(String fileName, String content, boolean append){
