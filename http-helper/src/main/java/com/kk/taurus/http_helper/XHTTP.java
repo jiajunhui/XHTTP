@@ -5,10 +5,9 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.google.gson.Gson;
-import com.kk.taurus.http_helper.bean.BaseResponse;
 import com.kk.taurus.http_helper.bean.XRequest;
-import com.kk.taurus.http_helper.callback.BeanCallBack;
 import com.kk.taurus.http_helper.callback.HttpCallBack;
+import com.kk.taurus.http_helper.callback.ReqCallBack;
 import com.kk.taurus.http_helper.thread.ThreadManager;
 
 import java.io.IOException;
@@ -27,6 +26,7 @@ import okhttp3.Response;
 public class XHTTP {
 
     private static final String TAG = "XHTTP";
+    public static final String CHAR_SET = "UTF-8";
     private static OkHttpClient okHttpClient;
     private static Handler handler = new Handler(Looper.getMainLooper());
 
@@ -34,7 +34,7 @@ public class XHTTP {
         okHttpClient = new OkHttpClient();
     }
 
-    public static <T extends BaseResponse> Call newGet(final XRequest request, final HttpCallBack<T> httpCallBack){
+    public static Call newGet(final XRequest request, final ReqCallBack reqCallBack){
         Request.Builder builder = new Request.Builder().url(request.getUrl());
         final Map<String,Object> headers = request.getHeaders();
         if(headers.size()>0){
@@ -55,46 +55,46 @@ public class XHTTP {
             builder.url(url);
         }
         Call call = okHttpClient.newCall(builder.build());
-        request(call,httpCallBack);
+        request(call,reqCallBack);
         return call;
     }
 
-    private static void request(final Call call,final HttpCallBack httpCallBack){
+    private static void request(final Call call,final ReqCallBack reqCallBack){
         ThreadManager.getLongPool().execute(new Runnable() {
             @Override
             public void run() {
                 try {
                     Response response = call.execute();
                     if(response.isSuccessful()){
-                        onHandleResult(response,httpCallBack);
+                        onHandleResult(response,reqCallBack);
                     }else{
-                        onError(response,httpCallBack);
+                        onError(response,reqCallBack);
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    onFailure(e,httpCallBack);
+                    onFailure(e,reqCallBack);
                 }
             }
         });
     }
 
-    private static <T extends BaseResponse> void onHandleResult(final Response response, final HttpCallBack<T> httpCallBack) {
+    private static <T> void onHandleResult(final Response response, final ReqCallBack<T> reqCallBack) {
         try {
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    httpCallBack.onSuccess(response);
+                    reqCallBack.onSuccess(response);
                 }
             });
-            String string = new String(response.body().bytes(),"UTF-8");
-            Log.i(TAG,string);
-            if(httpCallBack instanceof BeanCallBack){
+            if(response.body()!=null){
+                String string = new String(response.body().bytes(),CHAR_SET);
+                Log.i(TAG,string);
                 Gson gson = new Gson();
-                final T t = gson.fromJson(string, ((BeanCallBack) httpCallBack).getType());
+                final T t = gson.fromJson(string, reqCallBack.getType());
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        ((BeanCallBack) httpCallBack).onResponseBean(t);
+                        reqCallBack.onResponseBean(t);
                     }
                 });
             }
@@ -125,7 +125,7 @@ public class XHTTP {
         }
     }
 
-    public static <T extends BaseResponse> Call newPost(XRequest request,HttpCallBack<T> httpCallBack){
+    public static Call newPost(XRequest request,ReqCallBack reqCallBack){
         Request.Builder builder = new Request.Builder().url(request.getUrl());
         Map<String,Object> headers = request.getHeaders();
         if(headers.size()>0){
@@ -142,7 +142,7 @@ public class XHTTP {
             builder.post(formBuilder.build());
         }
         Call call = okHttpClient.newCall(builder.build());
-        request(call,httpCallBack);
+        request(call,reqCallBack);
         return call;
     }
 

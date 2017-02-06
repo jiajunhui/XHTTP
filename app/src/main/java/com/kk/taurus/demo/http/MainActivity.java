@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         xRequest.setUrl("http://v.juhe.cn/weixin/query");
         xRequest.addParams("pno",1);
         xRequest.addParams("ps",20);
-        xRequest.addParams("key","xxxxx");
+        xRequest.addParams("key","xxx");
 
         XHTTP.newGet(xRequest, new BeanCallBack<WxArticleRsp>() {
             @Override
