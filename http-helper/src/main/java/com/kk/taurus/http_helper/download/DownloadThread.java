@@ -81,10 +81,12 @@ public class DownloadThread implements Runnable {
             is = response.body().byteStream();
             long length = response.body().contentLength();
             long _totalSize = length;
+            boolean append = false;
             ConfigManager.DownloadConfig downloadConfig = downloadRequest.getDownloadConfig();
             if(downloadConfig!=null){
                 if(downloadConfig.getTotalSize()>=length){
                     _totalSize = downloadConfig.getTotalSize();
+                    append = true;
                 }
             }else{
                 downloadConfig = new ConfigManager.DownloadConfig();
@@ -92,7 +94,7 @@ public class DownloadThread implements Runnable {
                 downloadConfig.setTotalSize(length);
                 downloadRequest.setDownloadConfig(downloadConfig);
             }
-            fos = new FileOutputStream(file,false);
+            fos = new FileOutputStream(file,append);
             long currMs = System.currentTimeMillis();
             long nowMs = 0;
             long sum = 0;
