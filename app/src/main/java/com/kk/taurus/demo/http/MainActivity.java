@@ -14,6 +14,7 @@ import com.kk.taurus.http_helper.bean.XRequest;
 import com.kk.taurus.http_helper.callback.BeanCallBack;
 import com.kk.taurus.http_helper.callback.OnDownloadListener;
 import com.kk.taurus.http_helper.download.DownloadManager;
+import com.kk.taurus.http_helper.download.DownloadTask;
 import com.kk.taurus.http_helper.utils.BytesHelper;
 
 import java.io.File;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ProgressBar mProgressBar;
     private TextView mTvInfo;
+    private DownloadTask downloadTask;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         mTvInfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                DownloadManager.stopDownload();
+                downloadTask.cancel();
             }
         });
 
@@ -67,7 +69,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
         String dir = getExternalCacheDir().getAbsolutePath();
-        DownloadManager.download(
+        //                System.out.println("download_Test_Progress : curr = " + curr + " total = " + total);
+        downloadTask = DownloadManager.download(
                 "http://172.16.218.64:8080/batamu.mp4"
                 , dir
                 , null, new OnDownloadListener() {
@@ -106,5 +109,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(downloadTask!=null){
+            downloadTask.cancel();
+        }
     }
 }
