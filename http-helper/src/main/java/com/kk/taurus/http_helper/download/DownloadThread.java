@@ -91,7 +91,11 @@ public class DownloadThread implements Runnable {
         int len;
         FileOutputStream fos = null;
         try{
-            File file = new File(downloadRequest.getDesDir(),downloadRequest.getRename());
+            File dir = new File(downloadRequest.getDesDir());
+            if(!dir.exists()){
+                dir.mkdirs();
+            }
+            File file = new File(dir,downloadRequest.getRename());
             long _currSize = file.length();
             is = response.body().byteStream();
             long length = response.body().contentLength();
@@ -104,6 +108,7 @@ public class DownloadThread implements Runnable {
                     append = true;
                 }
             }else{
+                _currSize = 0;
                 downloadConfig = new ConfigManager.DownloadConfig();
                 downloadConfig.setUpdateTime(System.currentTimeMillis());
                 downloadConfig.setTotalSize(length);
@@ -165,6 +170,7 @@ public class DownloadThread implements Runnable {
     }
 
     private void onFinish(final File file) {
+        onSpeed(0,1);
         ConfigManager.deleteConfig(downloadRequest);
         if(onDownloadListener!=null){
             XHTTP.handler.post(new Runnable() {
@@ -174,7 +180,6 @@ public class DownloadThread implements Runnable {
                 }
             });
         }
-        onSpeed(0,1);
     }
 
     private void onProgressChange(final long currSize, final long totalSize) {

@@ -41,16 +41,20 @@ public class XHTTP {
     private static OkHttpClient okHttpClient;
     public static Handler handler = new Handler(Looper.getMainLooper());
 
+    static {
+        okHttpClient = new OkHttpClient();
+    }
+
     public static void init(Application application, OkHttpClient.Builder builder){
         context = application.getApplicationContext();
         if(builder!=null){
             okHttpClient = builder.build();
-        }else{
-            okHttpClient = new OkHttpClient();
         }
     }
 
-    public static boolean isNetAvaliable(){
+    public static boolean isNetAvailable(){
+        if(context==null)
+            throw new RuntimeException("context need init, you should call method XHTTP.init() .");
         return Utils.isAvailable(context);
     }
 
@@ -94,7 +98,7 @@ public class XHTTP {
 
     private static void request(final Call call,final ReqCallBack reqCallBack){
 
-        if(!isNetAvaliable()){
+        if(!isNetAvailable()){
             onError(HttpCallBack.ERROR_TYPE_NETWORK,null,reqCallBack);
             return;
         }

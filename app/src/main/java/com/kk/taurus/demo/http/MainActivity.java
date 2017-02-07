@@ -1,5 +1,6 @@
 package com.kk.taurus.demo.http;
 
+import android.graphics.Color;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -24,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar mProgressBar;
     private TextView mTvSpeed;
     private TextView mTvFileInfo;
+    private TextView mTvState;
     private DownloadTask downloadTask;
 
     @Override
@@ -33,12 +35,24 @@ public class MainActivity extends AppCompatActivity {
 
         mTvSpeed = (TextView) findViewById(R.id.tv_speed);
         mTvFileInfo = (TextView) findViewById(R.id.tv_file_info);
+        mTvState = (TextView) findViewById(R.id.tv_state);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        mTvSpeed.setOnClickListener(new View.OnClickListener() {
+        mTvState.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                downloadTask.cancel();
+                if(downloadTask==null){
+                    startDownload();
+                    mTvState.setText("pause");
+                }else{
+                    if(!downloadTask.isCancel()){
+                        downloadTask.cancel();
+                        mTvState.setText("start");
+                    }else{
+                        startDownload();
+                        mTvState.setText("pause");
+                    }
+                }
             }
         });
 
@@ -68,12 +82,15 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    private void startDownload() {
         String dir = getExternalCacheDir().getAbsolutePath();
         //                System.out.println("download_Test_Progress : curr = " + curr + " total = " + total);
         downloadTask = DownloadManager.download(
-                "http://172.16.218.64:8080/batamu.mp4"
+                "http://172.16.218.64:8080/story1.mp4"
                 , dir
-                , null, new OnDownloadListener() {
+                , "test_download.mp4", new OnDownloadListener() {
             @Override
             public void onStart() {
                 System.out.println("download_Test_Start_Download");
@@ -83,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
             public void onProgress(long curr, long total) {
                 mProgressBar.setMax((int) total);
                 mProgressBar.setProgress((int) curr);
-                mTvFileInfo.setText(BytesHelper.formatBytes(curr) + "/" + BytesHelper.formatBytes(total));
+                mTvFileInfo.setText(BytesHelper.formatBytes(curr) + "/" + BytesHelper.formatBytes(total) + "    " + (curr*100/total) + "%");
             }
 
             @Override
@@ -95,7 +112,10 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onFinish(File file) {
-                System.out.println("download_Test_Finish_Download");
+                mTvState.setText("finish");
+                mTvState.setTextColor(Color.parseColor("#cccccc"));
+                mTvState.setEnabled(false);
+                System.out.println("download_Test_Finish_Download " + "fileName = " + file.getName() + " file_size = " + BytesHelper.formatBytes(file.length()));
             }
 
             @Override
@@ -108,7 +128,6 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println("download_Test_onFailure......");
             }
         });
-
     }
 
     @Override

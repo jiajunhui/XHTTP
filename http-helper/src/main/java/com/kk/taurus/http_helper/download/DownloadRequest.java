@@ -56,7 +56,10 @@ public class DownloadRequest extends XRequest {
 
     private String subFileNameByUrl(){
         int index = getUrl().lastIndexOf("/");
-        int len = getUrl().length();
-        return getUrl().substring(index + 1 , len);
+        if(index!=-1){
+            int len = getUrl().length();
+            return getUrl().substring(index + 1 , len);
+        }
+        return String.valueOf(System.currentTimeMillis());
     }
 }

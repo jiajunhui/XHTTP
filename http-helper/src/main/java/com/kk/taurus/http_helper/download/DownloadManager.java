@@ -33,7 +33,7 @@ public class DownloadManager {
 
         final Call call = XHTTP.buildCall(downloadRequest);
 
-        if(!XHTTP.isNetAvaliable()){
+        if(!XHTTP.isNetAvailable()){
             if(onDownloadListener!=null){
                 onDownloadListener.onError(OnDownloadListener.ERROR_TYPE_NETWORK,null);
             }

@@ -6,6 +6,7 @@ package com.kk.taurus.http_helper.download;
 
 public class DownloadTask {
 
+    private boolean cancel;
     private DownloadThread downloadThread;
 
     public DownloadThread getDownloadThread() {
@@ -19,6 +20,11 @@ public class DownloadTask {
     public void cancel(){
         if(downloadThread!=null){
             downloadThread.quit();
+            cancel = true;
         }
+    }
+
+    public boolean isCancel() {
+        return cancel;
     }
 }
