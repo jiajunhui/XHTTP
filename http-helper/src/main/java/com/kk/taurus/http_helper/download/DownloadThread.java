@@ -37,8 +37,8 @@ public class DownloadThread implements Runnable {
     }
 
     public void quit() {
-        mQuit = true;
         mCall.cancel();
+        mQuit = true;
     }
 
     public boolean isQuit(){
@@ -53,10 +53,25 @@ public class DownloadThread implements Runnable {
                 mCall.cancel();
             }else if(response.isSuccessful()){
                 onInputStream(response);
+            }else{
+                onError(response);
             }
         } catch (IOException e) {
             e.printStackTrace();
+            onFailure(e);
         }
+    }
+
+    private void onError(final Response response) {
+        if(onDownloadListener!=null){
+            XHTTP.handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    onDownloadListener.onError(OnDownloadListener.ERROR_TYPE_RESPONSE,response);
+                }
+            });
+        }
+        onSpeed(0,1);
     }
 
     private void onStart() {
@@ -96,7 +111,7 @@ public class DownloadThread implements Runnable {
             }
             fos = new FileOutputStream(file,append);
             long currMs = System.currentTimeMillis();
-            long nowMs = 0;
+            long nowMs;
             long sum = 0;
             while ((len = is.read(buf)) != -1){
                 sum += len;
@@ -137,19 +152,20 @@ public class DownloadThread implements Runnable {
         ConfigManager.writeConfig(downloadRequest,downloadRequest.getDownloadConfig());
     }
 
-    private void onSpeed(long sum, long dMs) {
+    private void onSpeed(final long sum, final long dMs) {
         if(onDownloadListener!=null){
-            final float speed = (float) (((sum/1024)*1.0)/(dMs*1.0/1000));
+            final long byteEverySecond = (long) (sum*1.0/(dMs*1.0/1000));
             XHTTP.handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    onDownloadListener.onSpeed(speed);
+                    onDownloadListener.onSpeed(byteEverySecond,sum,dMs);
                 }
             });
         }
     }
 
     private void onFinish(final File file) {
+        ConfigManager.deleteConfig(downloadRequest);
         if(onDownloadListener!=null){
             XHTTP.handler.post(new Runnable() {
                 @Override
@@ -158,6 +174,7 @@ public class DownloadThread implements Runnable {
                 }
             });
         }
+        onSpeed(0,1);
     }
 
     private void onProgressChange(final long currSize, final long totalSize) {
@@ -189,6 +206,7 @@ public class DownloadThread implements Runnable {
                 }
             });
         }
+        onSpeed(0,1);
     }
 
 }

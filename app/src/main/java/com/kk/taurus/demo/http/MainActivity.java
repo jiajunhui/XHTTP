@@ -1,11 +1,9 @@
 package com.kk.taurus.demo.http;
 
-import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ProgressBar;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,7 +22,8 @@ import okhttp3.Response;
 public class MainActivity extends AppCompatActivity {
 
     private ProgressBar mProgressBar;
-    private TextView mTvInfo;
+    private TextView mTvSpeed;
+    private TextView mTvFileInfo;
     private DownloadTask downloadTask;
 
     @Override
@@ -32,10 +31,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTvInfo = (TextView) findViewById(R.id.tv_info);
+        mTvSpeed = (TextView) findViewById(R.id.tv_speed);
+        mTvFileInfo = (TextView) findViewById(R.id.tv_file_info);
         mProgressBar = (ProgressBar) findViewById(R.id.progressBar);
 
-        mTvInfo.setOnClickListener(new View.OnClickListener() {
+        mTvSpeed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 downloadTask.cancel();
@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         xRequest.setUrl("http://v.juhe.cn/weixin/query");
         xRequest.addParams("pno",1);
         xRequest.addParams("ps",20);
-        xRequest.addParams("key","211fa04958b2cc67461c9afc01965db5");
+        xRequest.addParams("key","xxx");
 
         XHTTP.newPost(xRequest, new BeanCallBack<WxArticleRsp>() {
             @Override
@@ -81,15 +81,15 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onProgress(long curr, long total) {
-//                System.out.println("download_Test_Progress : curr = " + curr + " total = " + total);
                 mProgressBar.setMax((int) total);
                 mProgressBar.setProgress((int) curr);
+                mTvFileInfo.setText(BytesHelper.formatBytes(curr) + "/" + BytesHelper.formatBytes(total));
             }
 
             @Override
-            public void onSpeed(float speed) {
-                String s = BytesHelper.getDecimalPrice(speed,2);
-                mTvInfo.setText(s);
+            public void onSpeed(long byteEverySecond, long bytes, long dms) {
+                String s = BytesHelper.formatBytes(byteEverySecond);
+                mTvSpeed.setText(s + "/s");
                 System.out.println("download_Test_Speed : speed = " + s);
             }
 
@@ -100,7 +100,7 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onError(int errorType, Response response) {
-                System.out.println("download_Test_OnError : " + errorType);
+                System.out.println("download_Test_OnError : " + errorType + " response : " + (response==null?"null":response.message()));
             }
 
             @Override

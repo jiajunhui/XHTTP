@@ -19,7 +19,7 @@ public class ConfigManager {
 
     public static DownloadConfig loadConfig(DownloadRequest downloadRequest){
         File file = new File(downloadRequest.getDesDir(),downloadRequest.getRename());
-        File config = new File(downloadRequest.getDesDir(), md5FileName(downloadRequest.getUrl()));
+        File config = getConfigFile(downloadRequest);
         if(config.exists() && file.exists()){
             Map<String, String> configMap = readConfig(config);
             if(configMap!=null && configMap.size()>0){
@@ -27,6 +27,17 @@ public class ConfigManager {
             }
         }
         return null;
+    }
+
+    public static boolean deleteConfig(DownloadRequest downloadRequest){
+        File config = getConfigFile(downloadRequest);
+        if(config.exists())
+            return config.delete();
+        return false;
+    }
+
+    private static File getConfigFile(DownloadRequest downloadRequest){
+        return new File(downloadRequest.getDesDir(), md5FileName(downloadRequest.getUrl()));
     }
 
     private static String md5FileName(String url){

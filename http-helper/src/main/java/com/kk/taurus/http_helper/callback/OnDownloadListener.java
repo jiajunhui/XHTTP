@@ -15,7 +15,7 @@ public interface OnDownloadListener {
 
     void onStart();
     void onProgress(long curr, long total);
-    void onSpeed(float speed);
+    void onSpeed(long byteEverySecond, long bytes, long dms);
     void onFinish(File file);
     void onError(int errorType, Response response);
     void onFailure(Exception e);
