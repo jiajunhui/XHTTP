@@ -226,4 +226,14 @@ public class XHTTP {
         return call;
     }
 
+    public static Call newPostJSON(XRequest request,Object jsonBean, ReqCallBack reqCallBack){
+        Request.Builder builder = buildRequest(request);
+        String json = JSON.toJSONString(jsonBean);
+        RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON,json);
+        builder.post(requestBody);
+        Call call = buildCall(builder.build());
+        request(call,reqCallBack);
+        return call;
+    }
+
 }

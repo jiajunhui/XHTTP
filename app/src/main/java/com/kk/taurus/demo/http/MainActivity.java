@@ -88,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
         String dir = getExternalCacheDir().getAbsolutePath();
         //                System.out.println("download_Test_Progress : curr = " + curr + " total = " + total);
         downloadTask = DownloadManager.download(
-                "http://172.16.218.64:8080/story1.mp4"
+                "http://172.16.218.64:8080/lvyexianzong.mkv"
                 , dir
                 , "test_download.mp4", new OnDownloadListener() {
             @Override

@@ -1,6 +1,6 @@
 package com.kk.taurus.demo.http;
 
-import com.kk.taurus.http_helper.bean.BaseResponse;
+import com.kk.taurus.http_helper.bean.AbsResponse;
 
 import java.io.Serializable;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.List;
  * Created by Taurus on 2017/2/4.
  */
 
-public class WxArticleRsp extends BaseResponse<WxArticleRsp.WxArticleList> {
+public class WxArticleRsp extends AbsResponse<WxArticleRsp.WxArticleList> {
 
     public int error_code;
     public String reason;

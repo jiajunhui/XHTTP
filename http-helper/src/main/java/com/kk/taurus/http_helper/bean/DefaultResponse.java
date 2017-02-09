@@ -14,36 +14,12 @@
  *    limitations under the License.
  */
 
-package com.kk.taurus.http_helper.callback;
-
-import com.kk.taurus.http_helper.bean.AbsResponse;
-
-import okhttp3.Response;
+package com.kk.taurus.http_helper.bean;
 
 /**
- * Created by Taurus on 2017/2/4.
+ * Created by Taurus on 2017/2/9.
  */
 
-public abstract class BeanCallBack<T extends AbsResponse> extends ReqCallBack<T> {
-
-    @Override
-    public void onStart() {
-
-    }
-
-    @Override
-    public void onSuccess(Response response) {
-
-    }
-
-    @Override
-    public void onError(int errorType, Response response) {
-
-    }
-
-    @Override
-    public void onFailure(Exception e) {
-
-    }
+public class DefaultResponse extends AbsResponse<Object> {
 
 }
