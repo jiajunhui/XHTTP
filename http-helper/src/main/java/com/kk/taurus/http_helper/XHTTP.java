@@ -34,6 +34,7 @@ import java.io.IOException;
 import java.util.Map;
 
 import okhttp3.Call;
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -215,25 +216,28 @@ public class XHTTP {
         return call;
     }
 
-    public static Call newPostJSON(XRequest request,ReqCallBack reqCallBack){
+    public static Call newPostJSON(XRequest request,Object jsonBean, ReqCallBack reqCallBack){
         Request.Builder builder = buildRequest(request);
-        Map<String,Object> params = request.getParams();
-        String json = JSON.toJSONString(params);
+        //post form params
+        Map<String, Object> params = request.getParams();
+        builder.post(buildFormBuilder(params).build());
+        //post json
+        String json = JSON.toJSONString(jsonBean);
         RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON,json);
-        builder.post(requestBody);
+        builder.put(requestBody);
         Call call = buildCall(builder.build());
         request(call,reqCallBack);
         return call;
     }
 
-    public static Call newPostJSON(XRequest request,Object jsonBean, ReqCallBack reqCallBack){
-        Request.Builder builder = buildRequest(request);
-        String json = JSON.toJSONString(jsonBean);
-        RequestBody requestBody = RequestBody.create(MEDIA_TYPE_JSON,json);
-        builder.post(requestBody);
-        Call call = buildCall(builder.build());
-        request(call,reqCallBack);
-        return call;
+    private static FormBody.Builder buildFormBuilder(Map<String, Object> params){
+        FormBody.Builder builder = new FormBody.Builder();
+        if(params!=null && params.size()>0){
+            for(String key:params.keySet()){
+                builder.add(key,params.get(key).toString());
+            }
+        }
+        return builder;
     }
 
 }
