@@ -11,6 +11,7 @@ import android.widget.Toast;
 import com.kk.taurus.http_helper.XHTTP;
 import com.kk.taurus.http_helper.bean.XRequest;
 import com.kk.taurus.http_helper.callback.BeanCallBack;
+import com.kk.taurus.http_helper.callback.OnDownloadCallBack;
 import com.kk.taurus.http_helper.callback.OnDownloadListener;
 import com.kk.taurus.http_helper.download.DownloadManager;
 import com.kk.taurus.http_helper.download.DownloadTask;
@@ -90,7 +91,7 @@ public class MainActivity extends AppCompatActivity {
         downloadTask = DownloadManager.download(
                 "http://172.16.218.64:8080/lvyexianzong.mkv"
                 , dir
-                , "test_download.mp4", new OnDownloadListener() {
+                , "test_download.mp4", new OnDownloadCallBack() {
             @Override
             public void onStart() {
                 System.out.println("download_Test_Start_Download");
