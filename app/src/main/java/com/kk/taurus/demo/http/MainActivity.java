@@ -75,12 +75,6 @@ public class MainActivity extends AppCompatActivity {
                 super.onError(errorType,response);
                 Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
             }
-
-            @Override
-            public void onFailure(Exception e) {
-                super.onFailure(e);
-                Toast.makeText(MainActivity.this, "failure", Toast.LENGTH_SHORT).show();
-            }
         });
 
     }
@@ -122,11 +116,6 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onError(int errorType, Response response) {
                 System.out.println("download_Test_OnError : " + errorType + " response : " + (response==null?"null":response.message()));
-            }
-
-            @Override
-            public void onFailure(Exception e) {
-                System.out.println("download_Test_onFailure......");
             }
         });
     }

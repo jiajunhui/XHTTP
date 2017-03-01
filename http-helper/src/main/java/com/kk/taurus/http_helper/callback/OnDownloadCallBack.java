@@ -45,9 +45,4 @@ public abstract class OnDownloadCallBack implements OnDownloadListener {
     public void onError(int errorType, Response response) {
 
     }
-
-    @Override
-    public void onFailure(Exception e) {
-
-    }
 }

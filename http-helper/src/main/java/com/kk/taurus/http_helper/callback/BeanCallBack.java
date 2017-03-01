@@ -41,9 +41,4 @@ public abstract class BeanCallBack<T extends AbsResponse> extends ReqCallBack<T>
 
     }
 
-    @Override
-    public void onFailure(Exception e) {
-
-    }
-
 }

@@ -26,9 +26,9 @@ public interface HttpCallBack {
 
     int ERROR_TYPE_RESPONSE = 0;
     int ERROR_TYPE_NETWORK = 1;
+    int ERROR_TYPE_EXCEPTION = 2;
 
     void onStart();
     void onSuccess(Response response);
     void onError(int errorType, Response response);
-    void onFailure(Exception e);
 }

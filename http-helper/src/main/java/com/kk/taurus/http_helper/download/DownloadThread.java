@@ -70,20 +70,20 @@ public class DownloadThread implements Runnable {
             }else if(response.isSuccessful()){
                 onInputStream(response);
             }else{
-                onError(response);
+                onError(OnDownloadListener.ERROR_TYPE_RESPONSE,response);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            onFailure(e);
+            onError(OnDownloadListener.ERROR_TYPE_EXCEPTION,null);
         }
     }
 
-    private void onError(final Response response) {
+    private void onError(final int errorType, final Response response) {
         if(onDownloadListener!=null){
             XHTTP.handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    onDownloadListener.onError(OnDownloadListener.ERROR_TYPE_RESPONSE,response);
+                    onDownloadListener.onError(errorType,response);
                 }
             });
         }
@@ -156,7 +156,7 @@ public class DownloadThread implements Runnable {
         }catch (Exception e){
             onSaveConfig();
             e.printStackTrace();
-            onFailure(e);
+            onError(OnDownloadListener.ERROR_TYPE_EXCEPTION,null);
         }finally{
             try{
                 if (is != null)
@@ -216,18 +216,6 @@ public class DownloadThread implements Runnable {
         String location = response.header("Location");
         downloadRequest.setUrl(location);
         startDownload();
-    }
-
-    private void onFailure(final Exception e){
-        if(onDownloadListener!=null){
-            XHTTP.handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    onDownloadListener.onFailure(e);
-                }
-            });
-        }
-        onSpeed(0,1);
     }
 
 }

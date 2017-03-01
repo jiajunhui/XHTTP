@@ -133,7 +133,7 @@ public class XHTTP {
                     }
                 } catch (IOException e) {
                     e.printStackTrace();
-                    onFailure(e,reqCallBack);
+                    onError(HttpCallBack.ERROR_TYPE_EXCEPTION,null,reqCallBack);
                 }
             }
         });
@@ -150,36 +150,21 @@ public class XHTTP {
         }
     }
 
-    private static <T> void onHandleResult(final Response response, final ReqCallBack<T> reqCallBack) {
-        try {
-            handler.post(new Runnable() {
-                @Override
-                public void run() {
-                    reqCallBack.onSuccess(response);
-                }
-            });
-            if(response.body()!=null){
-                String string = new String(response.body().bytes(),CHAR_SET);
-                Log.i(TAG,string);
-                final T t = JSON.parseObject(string,reqCallBack.getType());
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        reqCallBack.onResponseBean(t);
-                    }
-                });
+    private static <T> void onHandleResult(final Response response, final ReqCallBack<T> reqCallBack) throws IOException {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                reqCallBack.onSuccess(response);
             }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
-
-    private static void onFailure(final Exception e, final HttpCallBack httpCallBack){
-        if(httpCallBack!=null){
+        });
+        if(response.body()!=null){
+            String string = new String(response.body().bytes(),CHAR_SET);
+            Log.i(TAG,string);
+            final T t = JSON.parseObject(string,reqCallBack.getType());
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    httpCallBack.onFailure(e);
+                    reqCallBack.onResponseBean(t);
                 }
             });
         }

@@ -28,11 +28,11 @@ public interface OnDownloadListener {
 
     int ERROR_TYPE_RESPONSE = 0;
     int ERROR_TYPE_NETWORK = 1;
+    int ERROR_TYPE_EXCEPTION = 1;
 
     void onStart();
     void onProgress(long curr, long total);
     void onSpeed(long byteEverySecond, long bytes, long dms);
     void onFinish(File file);
     void onError(int errorType, Response response);
-    void onFailure(Exception e);
 }
