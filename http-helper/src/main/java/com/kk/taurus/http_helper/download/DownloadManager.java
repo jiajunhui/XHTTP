@@ -59,7 +59,7 @@ public class DownloadManager {
 
         DownloadThread downloadThread = new DownloadThread(call,downloadRequest,onDownloadListener);
         downloadTask.setDownloadThread(downloadThread);
-        ThreadManager.getLongPool().execute(downloadThread);
+        ThreadManager.getInstance().execute(downloadThread);
 
         return downloadTask;
     }

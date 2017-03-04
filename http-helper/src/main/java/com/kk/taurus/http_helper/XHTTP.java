@@ -120,7 +120,7 @@ public class XHTTP {
             return;
         }
 
-        ThreadManager.getLongPool().execute(new Runnable() {
+        ThreadManager.getInstance().execute(new Runnable() {
             @Override
             public void run() {
                 try {

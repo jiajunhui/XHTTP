@@ -3,11 +3,11 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
 // 这个version是区分library版本的，因此当我们需要更新library时记得修改这个version
-version = "1.0.7"
+version = "1.0.8"
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "24.0.1"
+    buildToolsVersion "25.0.2"
 
     defaultConfig {
         minSdkVersion 14
@@ -38,6 +38,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.squareup.okhttp3:okhttp:3.6.0'
     compile 'com.alibaba:fastjson:1.2.8'
+    compile 'com.kk.taurus.threadpool:threadpool:1.0.1'
 }
 
 def siteUrl = 'https://github.com/jiajunhui/XHTTP'      // 项目的主页
