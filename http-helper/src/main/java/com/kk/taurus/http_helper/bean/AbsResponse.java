@@ -38,7 +38,7 @@ public abstract class AbsResponse<T> implements Serializable {
     /**
      * user data
      */
-    public T result;
+    public T data;
 
     public Type getType() {
         Type mySuperClass = getClass().getGenericSuperclass();

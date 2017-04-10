@@ -31,7 +31,6 @@ import com.kk.taurus.http_helper.thread.ThreadManager;
 import com.kk.taurus.http_helper.utils.Utils;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Map;
 
 import okhttp3.Call;
@@ -132,7 +131,7 @@ public class XHTTP {
                     }else{
                         onError(HttpCallBack.ERROR_TYPE_RESPONSE,response,reqCallBack);
                     }
-                } catch (IOException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                     onError(HttpCallBack.ERROR_TYPE_EXCEPTION,null,reqCallBack);
                 }
@@ -151,7 +150,7 @@ public class XHTTP {
         }
     }
 
-    private static <T extends AbsResponse> void onHandleResult(final Response response, final ReqCallBack<T> reqCallBack) throws IOException {
+    private static <T extends AbsResponse> void onHandleResult(final Response response, final ReqCallBack<T> reqCallBack) throws Exception {
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -162,7 +161,7 @@ public class XHTTP {
             String string = new String(response.body().bytes(),CHAR_SET);
             Log.i(TAG,string);
             final T result = reqCallBack.getResponseInstance();
-            result.result = JSON.parseObject(string,reqCallBack.getResponseInstance().getType());
+            result.data = JSON.parseObject(string,reqCallBack.getResponseInstance().getType());
             if(result!=null){
                 result.code = response.code();
                 result.message = response.message();
