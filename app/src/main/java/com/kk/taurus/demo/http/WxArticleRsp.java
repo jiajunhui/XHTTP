@@ -9,10 +9,13 @@ import java.util.List;
  * Created by Taurus on 2017/2/4.
  */
 
-public class WxArticleRsp extends AbsResponse<WxArticleRsp.WxArticleList> {
+public class WxArticleRsp extends AbsResponse<WxArticleRsp.WxArticleData> {
 
-    public int error_code;
-    public String reason;
+    public static class WxArticleData implements Serializable{
+        public int error_code;
+        public String reason;
+        public WxArticleList result;
+    }
 
     public static class WxArticleList{
         public int totalPage;
