@@ -161,15 +161,16 @@ public class XHTTP {
         if(response.body()!=null){
             String string = new String(response.body().bytes(),CHAR_SET);
             Log.i(TAG,string);
-            final T t = JSON.parseObject(string,reqCallBack.getType());
-            if(t!=null){
-                t.code = response.code();
-                t.message = response.message();
+            final T result = reqCallBack.getResponseInstance();
+            result.result = JSON.parseObject(string,reqCallBack.getResponseInstance().getType());
+            if(result!=null){
+                result.code = response.code();
+                result.message = response.message();
             }
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    reqCallBack.onResponseBean(t);
+                    reqCallBack.onResponseBean(result);
                 }
             });
         }

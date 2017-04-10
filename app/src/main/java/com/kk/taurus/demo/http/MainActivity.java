@@ -8,6 +8,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.kk.taurus.demo.http.bean.NewsResponse;
 import com.kk.taurus.http_helper.XHTTP;
 import com.kk.taurus.http_helper.bean.XRequest;
 import com.kk.taurus.http_helper.callback.BeanCallBack;
@@ -57,11 +58,20 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        XRequest test = new XRequest();
+        test.setUrl("http://bike.sjwyb.com/news.json");
+        XHTTP.newGet(test, new BeanCallBack<NewsResponse>() {
+            @Override
+            public void onResponseBean(NewsResponse result) {
+                System.out.println("data : " + result);
+            }
+        });
+
         XRequest xRequest = new XRequest();
         xRequest.setUrl("http://v.juhe.cn/weixin/query");
         xRequest.addParams("pno",1);
         xRequest.addParams("ps",20);
-        xRequest.addParams("key","xxx");
+        xRequest.addParams("key","211fa04958b2cc67461c9afc01965db5");
 
         XHTTP.newPost(xRequest, new BeanCallBack<WxArticleRsp>() {
             @Override

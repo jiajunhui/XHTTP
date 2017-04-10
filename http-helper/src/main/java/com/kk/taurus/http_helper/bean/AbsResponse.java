@@ -17,13 +17,33 @@
 package com.kk.taurus.http_helper.bean;
 
 import java.io.Serializable;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 
 /**
  * Created by Taurus on 2017/2/4.
  */
 
 public abstract class AbsResponse<T> implements Serializable {
+    /**
+     * HTTP status code, such as 200,404.
+     */
     public int code;
+
+    /**
+     * HTTP response message
+     */
     public String message;
+
+    /**
+     * user data
+     */
     public T result;
+
+    public Type getType() {
+        Type mySuperClass = getClass().getGenericSuperclass();
+        Type type = ((ParameterizedType) mySuperClass).getActualTypeArguments()[0];
+        return type;
+    }
+
 }
