@@ -25,6 +25,7 @@ import android.util.Log;
 import com.alibaba.fastjson.JSON;
 import com.kk.taurus.http_helper.bean.AbsResponse;
 import com.kk.taurus.http_helper.bean.XRequest;
+import com.kk.taurus.http_helper.bean.XResponse;
 import com.kk.taurus.http_helper.callback.HttpCallBack;
 import com.kk.taurus.http_helper.callback.ReqCallBack;
 import com.kk.taurus.http_helper.thread.ThreadManager;
@@ -129,7 +130,15 @@ public class XHTTP {
                     if(response.isSuccessful()){
                         onHandleResult(response,reqCallBack);
                     }else{
-                        onError(HttpCallBack.ERROR_TYPE_RESPONSE,response,reqCallBack);
+                        XResponse xResponse = new XResponse();
+                        if(response!=null){
+                            xResponse.setCode(response.code());
+                            xResponse.setMessage(response.message());
+                            if(response.body()!=null){
+                                xResponse.setBody(response.body().bytes());
+                            }
+                        }
+                        onError(HttpCallBack.ERROR_TYPE_RESPONSE,xResponse,reqCallBack);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -151,31 +160,54 @@ public class XHTTP {
     }
 
     private static <T extends AbsResponse> void onHandleResult(final Response response, final ReqCallBack<T> reqCallBack) throws Exception {
-        handler.post(new Runnable() {
-            @Override
-            public void run() {
-                reqCallBack.onSuccess(response);
-            }
-        });
         if(response.body()!=null){
-            String string = new String(response.body().bytes(),CHAR_SET);
+            byte[] bytes = response.body().bytes();
+            int code = response.code();
+            String message = response.message();
+            //call back on success xResponse
+            XResponse xResponse = new XResponse();
+            xResponse.setCode(code);
+            xResponse.setMessage(message);
+            xResponse.setBody(bytes);
+            //callback
+            onSuccessXResponse(xResponse,reqCallBack);
+
+            String string = new String(bytes,CHAR_SET);
             Log.i(TAG,string);
-            final T result = reqCallBack.getResponseInstance();
-            result.data = JSON.parseObject(string,reqCallBack.getResponseInstance().getType());
-            if(result!=null){
-                result.code = response.code();
-                result.message = response.message();
+            if(reqCallBack==null){
+                onError(HttpCallBack.ERROR_TYPE_PARSE,xResponse,reqCallBack);
+                return;
             }
+            final T result = reqCallBack.getResponseInstance();
+            if(result!=null){
+                result.data = JSON.parseObject(string,reqCallBack.getResponseInstance().getType());
+                result.code = code;
+                result.message = message;
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        reqCallBack.onResponseBean(result);
+                    }
+                });
+            }else{
+                onError(HttpCallBack.ERROR_TYPE_PARSE,xResponse,reqCallBack);
+            }
+
+        }
+    }
+
+    private static void onSuccessXResponse(final XResponse response, final ReqCallBack reqCallBack){
+        if(reqCallBack!=null){
             handler.post(new Runnable() {
                 @Override
                 public void run() {
-                    reqCallBack.onResponseBean(result);
+                    reqCallBack.onSuccess(response);
                 }
             });
         }
     }
 
-    private static void onError(final int errorType, final Response response, final HttpCallBack httpCallBack){
+    private static void onError(final int errorType, final XResponse response, final HttpCallBack httpCallBack){
         if(httpCallBack!=null){
             handler.post(new Runnable() {
                 @Override

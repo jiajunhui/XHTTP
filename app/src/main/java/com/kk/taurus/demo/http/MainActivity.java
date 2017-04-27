@@ -11,9 +11,9 @@ import android.widget.Toast;
 import com.kk.taurus.demo.http.bean.NewsResponse;
 import com.kk.taurus.http_helper.XHTTP;
 import com.kk.taurus.http_helper.bean.XRequest;
+import com.kk.taurus.http_helper.bean.XResponse;
 import com.kk.taurus.http_helper.callback.BeanCallBack;
 import com.kk.taurus.http_helper.callback.OnDownloadCallBack;
-import com.kk.taurus.http_helper.callback.OnDownloadListener;
 import com.kk.taurus.http_helper.download.DownloadManager;
 import com.kk.taurus.http_helper.download.DownloadTask;
 import com.kk.taurus.http_helper.utils.BytesHelper;
@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onError(int errorType,Response response) {
+            public void onError(int errorType,XResponse response) {
                 super.onError(errorType,response);
                 Toast.makeText(MainActivity.this, "error", Toast.LENGTH_SHORT).show();
             }

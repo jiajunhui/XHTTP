@@ -14,22 +14,39 @@
  *    limitations under the License.
  */
 
-package com.kk.taurus.http_helper.callback;
+package com.kk.taurus.http_helper.bean;
 
-import com.kk.taurus.http_helper.bean.XResponse;
 
 /**
- * Created by Taurus on 2017/2/4.
+ * Created by Taurus on 2017/4/27.
  */
 
-public interface HttpCallBack {
+public class XResponse{
+    private int code;
+    private String message;
+    private byte[] body;
 
-    int ERROR_TYPE_RESPONSE = 0;
-    int ERROR_TYPE_NETWORK = 1;
-    int ERROR_TYPE_EXCEPTION = 2;
-    int ERROR_TYPE_PARSE = 3;
+    public int getCode() {
+        return code;
+    }
 
-    void onStart();
-    void onSuccess(XResponse response);
-    void onError(int errorType, XResponse response);
+    public void setCode(int code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public byte[] getBody() {
+        return body;
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
+    }
 }

@@ -32,7 +32,9 @@ public abstract class ReqCallBack<T extends AbsResponse> implements HttpCallBack
     public ReqCallBack(){
         Type genType = getClass().getGenericSuperclass();
         Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
-        response = (Class) params[0];
+        if(params!=null && params.length>0){
+            response = (Class) params[0];
+        }
     }
 
     public abstract void onResponseBean(T result);
@@ -40,9 +42,7 @@ public abstract class ReqCallBack<T extends AbsResponse> implements HttpCallBack
     public T getResponseInstance(){
         try {
             return response.newInstance();
-        } catch (InstantiationException e) {
-            e.printStackTrace();
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

@@ -17,8 +17,7 @@
 package com.kk.taurus.http_helper.callback;
 
 import com.kk.taurus.http_helper.bean.AbsResponse;
-
-import okhttp3.Response;
+import com.kk.taurus.http_helper.bean.XResponse;
 
 /**
  * Created by Taurus on 2017/2/4.
@@ -32,12 +31,12 @@ public abstract class BeanCallBack<T extends AbsResponse> extends ReqCallBack<T>
     }
 
     @Override
-    public void onSuccess(Response response) {
+    public void onSuccess(XResponse response) {
 
     }
 
     @Override
-    public void onError(int errorType, Response response) {
+    public void onError(int errorType, XResponse response) {
 
     }
 
