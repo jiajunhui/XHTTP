@@ -30,10 +30,14 @@ public abstract class ReqCallBack<T extends AbsResponse> implements HttpCallBack
     private Class<T> response;
 
     public ReqCallBack(){
-        Type genType = getClass().getGenericSuperclass();
-        Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
-        if(params!=null && params.length>0){
-            response = (Class) params[0];
+        try {
+            Type genType = getClass().getGenericSuperclass();
+            Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+            if(params!=null && params.length>0){
+                response = (Class) params[0];
+            }
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
