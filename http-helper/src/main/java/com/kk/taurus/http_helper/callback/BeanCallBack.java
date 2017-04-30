@@ -43,10 +43,10 @@ public abstract class BeanCallBack<T> extends ReqCallBack<T> {
     @Override
     public T parseBean(XResponse response) {
         byte[] bytes = response.getBody();
-        if(bytes!=null && bytes.length>0){
+        if(bytes!=null && bytes.length>0 && getType()!=null){
             String json = new String(bytes);
             return JSON.parseObject(json,getType());
         }
-        return null;
+        return getResponseInstance();
     }
 }

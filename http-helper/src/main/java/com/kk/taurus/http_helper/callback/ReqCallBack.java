@@ -27,6 +27,20 @@ import java.lang.reflect.Type;
 
 public abstract class ReqCallBack<T> implements HttpCallBack {
 
+    private Class<T> response;
+
+    public ReqCallBack(){
+        try {
+            Type genType = getClass().getGenericSuperclass();
+            Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
+            if(params!=null && params.length>0){
+                response = (Class) params[0];
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     public abstract void onResponseBean(T result);
 
     public abstract T parseBean(XResponse response);
@@ -41,5 +55,15 @@ public abstract class ReqCallBack<T> implements HttpCallBack {
         }
         return null;
     }
+
+    public T getResponseInstance(){
+        try {
+            return response.newInstance();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
 
 }

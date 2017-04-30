@@ -178,16 +178,12 @@ public class XHTTP {
                 return;
             }
             final T result = reqCallBack.parseBean(xResponse);
-            if(result!=null){
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        reqCallBack.onResponseBean(result);
-                    }
-                });
-            }else{
-                onError(HttpCallBack.ERROR_TYPE_PARSE,xResponse,reqCallBack);
-            }
+            handler.post(new Runnable() {
+                @Override
+                public void run() {
+                    reqCallBack.onResponseBean(result);
+                }
+            });
 
         }
     }
