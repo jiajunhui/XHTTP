@@ -16,14 +16,14 @@
 
 package com.kk.taurus.http_helper.callback;
 
-import com.kk.taurus.http_helper.bean.AbsResponse;
+import com.alibaba.fastjson.JSON;
 import com.kk.taurus.http_helper.bean.XResponse;
 
 /**
  * Created by Taurus on 2017/2/4.
  */
 
-public abstract class BeanCallBack<T extends AbsResponse> extends ReqCallBack<T> {
+public abstract class BeanCallBack<T> extends ReqCallBack<T> {
 
     @Override
     public void onStart() {
@@ -40,4 +40,13 @@ public abstract class BeanCallBack<T extends AbsResponse> extends ReqCallBack<T>
 
     }
 
+    @Override
+    public T parseBean(XResponse response) {
+        byte[] bytes = response.getBody();
+        if(bytes!=null && bytes.length>0){
+            String json = new String(bytes);
+            return JSON.parseObject(json,getType());
+        }
+        return null;
+    }
 }

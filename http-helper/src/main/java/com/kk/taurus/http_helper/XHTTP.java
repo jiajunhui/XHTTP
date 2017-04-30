@@ -23,7 +23,6 @@ import android.os.Looper;
 import android.util.Log;
 
 import com.alibaba.fastjson.JSON;
-import com.kk.taurus.http_helper.bean.AbsResponse;
 import com.kk.taurus.http_helper.bean.XRequest;
 import com.kk.taurus.http_helper.bean.XResponse;
 import com.kk.taurus.http_helper.callback.HttpCallBack;
@@ -159,7 +158,7 @@ public class XHTTP {
         }
     }
 
-    private static <T extends AbsResponse> void onHandleResult(final Response response, final ReqCallBack<T> reqCallBack) throws Exception {
+    private static <T> void onHandleResult(final Response response, final ReqCallBack<T> reqCallBack) throws Exception {
         if(response.body()!=null){
             byte[] bytes = response.body().bytes();
             int code = response.code();
@@ -178,11 +177,8 @@ public class XHTTP {
                 onError(HttpCallBack.ERROR_TYPE_PARSE,xResponse,reqCallBack);
                 return;
             }
-            final T result = reqCallBack.getResponseInstance();
+            final T result = reqCallBack.parseBean(xResponse);
             if(result!=null){
-                result.data = JSON.parseObject(string,reqCallBack.getResponseInstance().getType());
-                result.code = code;
-                result.message = message;
                 handler.post(new Runnable() {
                     @Override
                     public void run() {

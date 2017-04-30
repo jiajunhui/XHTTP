@@ -16,7 +16,7 @@
 
 package com.kk.taurus.http_helper.callback;
 
-import com.kk.taurus.http_helper.bean.AbsResponse;
+import com.kk.taurus.http_helper.bean.XResponse;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -25,28 +25,18 @@ import java.lang.reflect.Type;
  * Created by Taurus on 2017/2/6.
  */
 
-public abstract class ReqCallBack<T extends AbsResponse> implements HttpCallBack {
-
-    private Class<T> response;
-
-    public ReqCallBack(){
-        try {
-            Type genType = getClass().getGenericSuperclass();
-            Type[] params = ((ParameterizedType) genType).getActualTypeArguments();
-            if(params!=null && params.length>0){
-                response = (Class) params[0];
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-    }
+public abstract class ReqCallBack<T> implements HttpCallBack {
 
     public abstract void onResponseBean(T result);
 
-    public T getResponseInstance(){
+    public abstract T parseBean(XResponse response);
+
+    public Type getType() {
         try {
-            return response.newInstance();
-        } catch (Exception e) {
+            Type mySuperClass = getClass().getGenericSuperclass();
+            Type type = ((ParameterizedType) mySuperClass).getActualTypeArguments()[0];
+            return type;
+        }catch (Exception e){
             e.printStackTrace();
         }
         return null;
